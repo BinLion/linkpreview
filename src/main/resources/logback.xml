@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true">
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <Target>System.out</Target>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="ERR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/yactivityapi.err.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/link.err.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/link.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/link.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger [%file:%line] [%X{logid}]- %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="REQINFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/reqinfo.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/reqinfo.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ACCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/access.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/access.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                %msg [%thread] [%X{logid}]%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STAT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/stat.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>
+                logs/stat.log.%d{yyyy-MM-dd}
+            </fileNamePattern>
+            <maxHistory>700</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %msg%n
+            </Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.google.code">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="org.eclipse">
+        <level value="INFO"/>
+    </logger>
+    <logger name="org.restlet">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="com.zayhu">
+        <level value="DEBUG"/>
+    </logger>
+
+    <logger name="LogService" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="ACCESS"/>
+    </logger>
+
+    <logger name="com.zayhu.server.utils.CommonReqInfoLogger" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="REQINFO"/>
+    </logger>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERR"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
