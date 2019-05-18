@@ -76,7 +76,7 @@ public class LinkPreviewService {
         } catch (Exception e) {
             logger.info("get doc 5 error.link:{}",linkUrl);
         }finally {
-            driver.close();
+            driver.quit();
         }
         if (doc != null){
             Elements metas = doc.head().select("meta");
