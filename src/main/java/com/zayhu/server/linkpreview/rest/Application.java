@@ -6,6 +6,7 @@ import com.zayhu.server.httpapi.rest.guice.FinderFactory;
 import com.zayhu.server.httpapi.rest.guice.RestletGuice;
 import com.zayhu.server.httpapi.ws.AbstractWSHandler;
 import com.zayhu.server.linkpreview.guice.GuiceModule;
+import com.zayhu.server.linkpreview.rest.api.LinkPreviewServerResource;
 import com.zayhu.server.linkpreview.rest.api.inner.LinkPreviewInnerServerResource;
 import com.zayhu.server.util.RestletLoggerUtils;
 import org.apache.commons.configuration.Configuration;
@@ -57,12 +58,13 @@ public class Application extends com.yeecall.yeetoken.yeeapi.rest.Application {
 
     protected void addApis(FinderFactory ff, Router router) {
         super.addApis(ff, router);
+        router.attach("/link/{method}",ff.finder(LinkPreviewServerResource.class));
     }
 
 
     protected void addInnerApis(FinderFactory ff, Router router) {
         super.addInnerApis(ff, router);
-        router.attach("/_inner/link/{method}",ff.finder(LinkPreviewInnerServerResource.class));
+        router.attach("/linkpreview/_inner/link/{method}",ff.finder(LinkPreviewInnerServerResource.class));
     }
 
     public static void main(String[] args) throws Exception {
@@ -71,7 +73,7 @@ public class Application extends com.yeecall.yeetoken.yeeapi.rest.Application {
         int ttl = injector.getInstance(Configuration.class).getInt("network.address.cache.ttl", 30);
         java.security.Security.setProperty("networkaddress.cache.ttl", String.valueOf(ttl));
         startApplication(new Application(injector) {
-        }, "linkpreview", "/linkpreview");
+        }, "linkpreview", "");
     }
 
     public static Application getInstaceOrStartMain(String [] args) throws Exception {
