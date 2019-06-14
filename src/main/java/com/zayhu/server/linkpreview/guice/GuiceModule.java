@@ -41,6 +41,7 @@ public class GuiceModule extends com.yeecall.yeetoken.yeeapi.guice.GuiceModule {
         options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("blink-settings=imagesEnabled=false");
+        options.addArguments("user-agent=WhatsApp/2.19.50 i");
         WebDriver driver = new ChromeDriver(options);
 
         return driver;

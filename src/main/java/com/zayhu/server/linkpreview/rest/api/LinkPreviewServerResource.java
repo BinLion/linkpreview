@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 
 public class LinkPreviewServerResource extends AbstractServerResource {
@@ -25,6 +26,10 @@ public class LinkPreviewServerResource extends AbstractServerResource {
     public Representation preview(Form form, Representation rep) throws IOException {
         Form post = new Form(rep);
         String url = this.getParamFirstValueOrThrow400("url",post);
+
+        // throw an exception when parse url error to skip other code
+        URL parsedURL = new URL(url);
+
         LinkPreview map = linkPreviewService.explainUrlFromCache(url);
         retrievalResponse.setResponse(map);
         return this.retrievalResponse.buildJsonResponse(pretty);

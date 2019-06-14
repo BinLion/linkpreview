@@ -8,10 +8,10 @@ import com.zayhu.server.httpapi.service.SimpleDAO;
 import com.zayhu.server.linkpreview.model.LinkPreview;
 import com.zayhu.server.linkpreview.util.UrlUtils;
 import com.zayhu.server.redis.RedisService;
+import com.zayhu.server.spider.SimpleHttpClient;
 import com.zayhu.server.util.ConfigUtils;
 import com.zayhu.server.util.JsonUtils;
 import com.zayhu.server.util.StatLogger;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.Jsoup;
@@ -22,6 +22,7 @@ import org.mongodb.morphia.Morphia;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.codecraft.webmagic.Site;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public class LinkPreviewService {
 
-    private static final String LINK_URL_CACHE = "link_url_cache_";
+    private static final String LINK_URL_CACHE = "linkpreview_cache_";
     protected SimpleDAO<LinkPreview, String> linkPreviewDAO;
     RedisService redisService;
     protected static final Logger logger = LoggerFactory.getLogger(LinkPreviewService.class);
@@ -52,17 +53,18 @@ public class LinkPreviewService {
         final String dbName = ConfigUtils.getDefDBName(conf);
         this.linkPreviewDAO = new SimpleDAO(LinkPreview.class, m, mor, dbName);
         this.driver = driver;
+
     }
 
     public LinkPreview explainUrlFromCache(String linkUrl) throws IOException {
+
         LinkPreview link = redisService.get(LINK_URL_CACHE + linkUrl, LinkPreview.class);
         boolean ifcache = true;
         if (link == null || StringUtils.isEmpty(link.title)) {
             ifcache = false;
             link = linkPreviewDAO.createQuery().field("url").equal(linkUrl).get();
             if (link == null) {
-                Map<String, Object> map = explainUrl(linkUrl);
-                link = JsonUtils.sharedMapper.convertValue(map, LinkPreview.class);
+                link = getPreviewInfo(linkUrl);
                 if (link != null && StringUtils.isNotEmpty(link.title)) {
                     link.mtime = System.currentTimeMillis();
                     linkPreviewDAO.save(link);
@@ -73,6 +75,33 @@ public class LinkPreviewService {
         }
         StatLogger.info("link preview request.uri:{},url:{},ifcache:{}", new URL(linkUrl).getHost(), linkUrl, ifcache);
         return link;
+    }
+
+    public LinkPreview getPreviewInfo(String url) throws MalformedURLException {
+        Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url);
+        SimpleHttpClient client = new SimpleHttpClient(site);
+        LinkPreview preview = client.get(url, LinkPreview.class);
+
+        URL parsedURL = new URL(url);
+        String host = parsedURL.getHost();
+
+        if (preview == null) {
+            preview = new LinkPreview();
+            preview.title = host;
+        }
+
+        preview.url = url;
+        preview.shorturl = UrlUtils.getShortUrl(url, conf.getString("shorturl_base", "http://in.debug.yeecall.com:5080/short/"));
+
+        if (StringUtils.isEmpty(preview.site)) {
+            preview.site = host;
+        }
+
+        if (StringUtils.isEmpty(preview.favicon)) {
+            preview.favicon = parsedURL.getProtocol() + "://" + host + "/favicon.ico";
+        }
+
+        return preview;
     }
 
     public Map<String, Object> explainUrl(String linkUrl) throws MalformedURLException {
