@@ -12,32 +12,32 @@ public class LinkPreview {
     public String url;
 
     @ExtractBy("//meta[@property='og:image']/@content")
-    public String image="";
+    public String image = "";
 
     @ExtractBy("//meta[@property='og:title']/@content | //title/text()")
-    public String title="";
+    public String title = "";
 
     @ExtractBy("//meta[@property='og:description']/@content | //meta[@name='description']/@content")
-    public String description="";
+    public String description = "";
 
     @ExtractBy("//meta[@property='og:local']/@content")
-    public String locale="";
+    public String locale = "";
 
     @ExtractBy("//meta[@property='og:site_name']/@content")
-    public String site="";
+    public String site = "";
 
     @ExtractBy("//meta[@property='og:type']/@content")
-    public String type="";
+    public String type = "";
 
-    public String shorturl="";
+    public String shorturl = "";
 
     public String favicon = "";
 
     @ExtractBy("//meta[@property='og:image:width']/@content")
-    public int imgW=0;
+    public int imgW = 0;
 
     @ExtractBy("//meta[@property='og:image:height']/@content")
-    public int imgH=0;
+    public int imgH = 0;
 
     public long mtime;
 

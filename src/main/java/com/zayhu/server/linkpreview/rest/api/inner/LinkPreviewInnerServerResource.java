@@ -2,6 +2,7 @@ package com.zayhu.server.linkpreview.rest.api.inner;
 
 import com.google.inject.Inject;
 import com.zayhu.server.httpapi.rest.api.AbstractInnerServerResource;
+import com.zayhu.server.linkpreview.model.LinkPreview;
 import com.zayhu.server.linkpreview.service.LinkPreviewService;
 import org.apache.commons.configuration.Configuration;
 import org.restlet.data.Form;
@@ -9,6 +10,7 @@ import org.restlet.representation.Representation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Map;
 
@@ -29,10 +31,10 @@ public class LinkPreviewInnerServerResource extends AbstractInnerServerResource 
         this.linkPreviewService = linkPreviewService;
     }
 
-    public Representation getDoc5(Form form) throws MalformedURLException {
+    public Representation getDoc5(Form form) throws IOException {
         String link = this.getParamFirstValueOrThrow400("linkUrl",form);
-        Map<String,Object> map = linkPreviewService.explainUrl(link);
-        retrievalResponse.setResponse(map);
+        LinkPreview preview = linkPreviewService.explainUrlFromCache(link);
+        retrievalResponse.setResponse(preview);
         return retrievalResponse.buildJsonResponse(pretty);
     }
 

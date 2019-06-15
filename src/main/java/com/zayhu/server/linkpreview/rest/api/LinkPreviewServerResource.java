@@ -25,7 +25,7 @@ public class LinkPreviewServerResource extends AbstractServerResource {
 
     public Representation preview(Form form, Representation rep) throws IOException {
         Form post = new Form(rep);
-        String url = this.getParamFirstValueOrThrow400("url",post);
+        String url = this.getParamFirstValueOrThrow400("url", post);
 
         // throw an exception when parse url error to skip other code
         URL parsedURL = new URL(url);
