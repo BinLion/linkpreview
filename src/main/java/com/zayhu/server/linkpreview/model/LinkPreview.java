@@ -31,6 +31,7 @@ public class LinkPreview {
 
     public String shorturl = "";
 
+    @ExtractBy("//link[@rel='shortcut icon']/@href | //link[@rel='icon']/@href")
     public String favicon = "";
 
     @ExtractBy("//meta[@property='og:image:width']/@content")

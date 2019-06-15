@@ -75,7 +75,7 @@ public class LinkPreviewService {
 
         if (preview == null) {
             preview = new LinkPreview();
-            preview.title = host;
+            preview.title = parsedURL.getPath();
         }
         try {
             for (int i = 0; i < 3; i++) {
@@ -99,6 +99,7 @@ public class LinkPreviewService {
         if (StringUtils.isEmpty(preview.favicon)) {
             preview.favicon = parsedURL.getProtocol() + "://" + host + "/favicon.ico";
         }
+        preview.favicon = UrlUtils.fixImageUrl(preview.favicon, parsedURL);
 
         return preview;
     }
