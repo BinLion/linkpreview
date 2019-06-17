@@ -16,6 +16,8 @@ import org.mongodb.morphia.Morphia;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Site;
+import us.codecraft.webmagic.proxy.Proxy;
+import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -66,12 +68,11 @@ public class LinkPreviewService {
     }
 
     public LinkPreview getPreviewInfo(String url) throws MalformedURLException {
-        Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url);
-        SimpleHttpClient client = new SimpleHttpClient(site);
-        LinkPreview preview = client.get(url, LinkPreview.class);
-
         URL parsedURL = new URL(url);
         String host = parsedURL.getHost();
+        Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).addHeader("Host", host).setTimeOut(10000);
+        SimpleHttpClient client = new SimpleHttpClient(site);
+        LinkPreview preview = client.get(url, LinkPreview.class);
 
         if (preview == null) {
             preview = new LinkPreview();

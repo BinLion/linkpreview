@@ -81,7 +81,8 @@ public class HttpClientGenerator {
 			
 		};
 		
-		SSLContext sc = SSLContext.getInstance("SSLv3");
+		//SSLContext sc = SSLContext.getInstance("SSLv3");
+        SSLContext sc = SSLContext.getInstance("SSL");
 		sc.init(null, new TrustManager[] { trustManager }, null);
 		return sc;
 	}
