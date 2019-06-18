@@ -17,7 +17,7 @@ public class LinkPreview implements AfterExtractor {
     @ExtractBy("//meta[@property='og:image']/@content | //img[@class='rich_pages']/@data-src")
     public String image = "";
 
-    @ExtractBy("//meta[@property='og:title']/@content | //h2/tidyText() | //title/tidyText()")
+    @ExtractBy("//meta[@property='og:title']/@content | //title/text()")
     public String title = "";
 
     @ExtractBy("//h2/tidyText()")
