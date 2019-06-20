@@ -45,23 +45,24 @@ public class LinkPreviewService {
     }
 
     public LinkPreview explainUrlFromCache(String linkUrl) throws IOException {
-
+        Long start = System.currentTimeMillis();
         LinkPreview link = redisService.get(LINK_URL_CACHE + linkUrl, LinkPreview.class);
-        boolean ifcache = true;
+        String from = "redis";
         if (link == null || StringUtils.isEmpty(link.title)) {
-            ifcache = false;
+            from = "mongo";
             link = linkPreviewDAO.createQuery().field("url").equal(linkUrl).get();
             if (link == null) {
+                from = "http";
                 link = getPreviewInfo(linkUrl);
                 if (link != null && StringUtils.isNotEmpty(link.title)) {
-                    link.mtime = System.currentTimeMillis();
                     linkPreviewDAO.save(link);
                 }
             }
             redisService.set(LINK_URL_CACHE + linkUrl, link);
             redisService.expire(LINK_URL_CACHE + linkUrl, conf.getInt("explain.url.expire.time", 60));
         }
-        StatLogger.info("link preview request.uri:{},url:{},ifcache:{}", new URL(linkUrl).getHost(), linkUrl, ifcache);
+        Long cost = System.currentTimeMillis() - start;
+        StatLogger.info("link preview request.host:{},url:{},from:{},cost:{}", new URL(linkUrl).getHost(), linkUrl, from, cost);
         return link;
     }
 

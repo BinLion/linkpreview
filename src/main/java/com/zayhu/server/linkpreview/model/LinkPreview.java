@@ -56,5 +56,11 @@ public class LinkPreview implements AfterExtractor {
         if (StringUtils.isEmpty(title)) {
             title = h2.trim();
         }
+
+        if (title.contains("404") || title.contains("Error")){
+            title = "";
+        }
+
+        mtime = System.currentTimeMillis();
     }
 }
