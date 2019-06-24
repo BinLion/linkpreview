@@ -10,9 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 public class LinkPreviewServerResource extends AbstractServerResource {
     private static final Logger sLogger = LoggerFactory.getLogger(LinkPreviewServerResource.class);
@@ -27,11 +25,15 @@ public class LinkPreviewServerResource extends AbstractServerResource {
         Form post = new Form(rep);
         String url = this.getParamFirstValueOrThrow400("url", post);
 
-        // throw an exception when parse url error to skip other code
-        URL parsedURL = new URL(url);
+        try {
+            URL parsedURL = new URL(url);
+            LinkPreview preview = linkPreviewService.explainUrlFromCache(url);
+            retrievalResponse.setResponse(preview);
+        } catch (Exception e) {
+            sLogger.error("url can not be pharsed, error:{}", e.getMessage());
+            retrievalResponse.setResponse(new LinkPreview());
+        }
 
-        LinkPreview map = linkPreviewService.explainUrlFromCache(url);
-        retrievalResponse.setResponse(map);
         return this.retrievalResponse.buildJsonResponse(pretty);
     }
 }

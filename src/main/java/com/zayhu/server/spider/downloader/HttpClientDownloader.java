@@ -1,7 +1,6 @@
 package com.zayhu.server.spider.downloader;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,23 +25,14 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * The http downloader based on HttpClient.
- *
- * @author code4crafter@gmail.com <br>
- * @since 0.1.0
- */
 public class HttpClientDownloader extends AbstractDownloader {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     private final Map<String, CloseableHttpClient> httpClients = new HashMap<String, CloseableHttpClient>();
-
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private HttpClientGenerator httpClientGenerator = new HttpClientGenerator();
 
     private HttpUriRequestConverter httpUriRequestConverter = new HttpUriRequestConverter();
-    
+
     private ProxyProvider proxyProvider;
 
     private boolean responseHeader = true;
@@ -103,7 +93,7 @@ public class HttpClientDownloader extends AbstractDownloader {
             onError(request);
             return page;
         } finally {
-            if (httpResponse != null && type.indexOf("html") != -1 ) {
+            if (httpResponse != null && type.indexOf("html") != -1) {
                 //ensure the connection is released back to pool
                 EntityUtils.consumeQuietly(httpResponse.getEntity());
             }
@@ -123,7 +113,7 @@ public class HttpClientDownloader extends AbstractDownloader {
         String contentType = httpResponse.getEntity().getContentType() == null ? "" : httpResponse.getEntity().getContentType().getValue();
         Page page = new Page();
         page.setBytes(bytes);
-        if (!request.isBinaryContent()){
+        if (!request.isBinaryContent()) {
             if (charset == null) {
                 charset = getHtmlCharset(contentType, bytes);
             }

@@ -59,7 +59,7 @@ public class LinkPreviewService {
                 }
             }
             redisService.set(LINK_URL_CACHE + linkUrl, link);
-            redisService.expire(LINK_URL_CACHE + linkUrl, conf.getInt("explain.url.expire.time", 60));
+            redisService.expire(LINK_URL_CACHE + linkUrl, conf.getInt("explain.url.expire.time", 600));
         }
         Long cost = System.currentTimeMillis() - start;
         StatLogger.info("link preview request.host:{},url:{},from:{},cost:{}", new URL(linkUrl).getHost(), linkUrl, from, cost);
@@ -72,12 +72,20 @@ public class LinkPreviewService {
         int timeout = conf.getInt("spider.timeout", 20000);
         Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).setTimeOut(timeout);
         SimpleHttpClient client = new SimpleHttpClient(site);
-        LinkPreview preview = client.get(url, LinkPreview.class);
+
+        LinkPreview preview = null;
+        try {
+            preview = client.get(url, LinkPreview.class);
+        } catch (Exception e) {
+            logger.error("get preview fail. error:{}", e.getMessage());
+            return new LinkPreview();
+        }
 
         if (preview == null) {
             preview = new LinkPreview();
-            preview.title = parsedURL.getPath();
+            //preview.title = parsedURL.getPath();
         }
+
         try {
             for (int i = 0; i < 3; i++) {
                 if (ifEncode(preview.title)) {
