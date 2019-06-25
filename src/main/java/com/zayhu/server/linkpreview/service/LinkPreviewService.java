@@ -46,6 +46,7 @@ public class LinkPreviewService {
 
     public LinkPreview explainUrlFromCache(String linkUrl) throws IOException {
         Long start = System.currentTimeMillis();
+        linkUrl = linkUrl.replace("\\", "");
         LinkPreview link = redisService.get(LINK_URL_CACHE + linkUrl, LinkPreview.class);
         String from = "redis";
         if (link == null || StringUtils.isEmpty(link.title)) {
