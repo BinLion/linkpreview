@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,7 +72,11 @@ public class LinkPreviewService {
         URL parsedURL = new URL(url);
         String host = parsedURL.getHost();
         int timeout = conf.getInt("spider.timeout", 20000);
-        Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).setTimeOut(timeout);
+        HashSet<Integer> statCodes = new HashSet<>();
+        statCodes.add(200);
+        statCodes.add(301);
+        statCodes.add(302);
+        Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).setTimeOut(timeout).setAcceptStatCode(statCodes);
         SimpleHttpClient client = new SimpleHttpClient(site);
 
         LinkPreview preview = null;

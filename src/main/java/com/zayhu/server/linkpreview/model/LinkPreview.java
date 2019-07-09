@@ -57,7 +57,7 @@ public class LinkPreview implements AfterExtractor {
             title = h2.trim();
         }
 
-        if (title.contains("404") || title.contains("Error")){
+        if (title.contains("404") || title.contains("403") || title.contains("Error")){
             title = "";
         }
 
