@@ -84,6 +84,12 @@ public class HttpClientDownloader extends AbstractDownloader {
                 return page;
             }
 
+            if (httpResponse.getStatusLine().getStatusCode() != 200) {
+                logger.info("http response is not 200, code is {}", httpResponse.getStatusLine().getStatusCode());
+                onError(request);
+                return page;
+            }
+
             page = handleResponse(request, request.getCharset() != null ? request.getCharset() : task.getSite().getCharset(), httpResponse, task);
             onSuccess(request);
             logger.info("downloading page success {}", request.getUrl());

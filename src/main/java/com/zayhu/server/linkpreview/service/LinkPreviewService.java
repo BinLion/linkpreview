@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,9 +75,11 @@ public class LinkPreviewService {
         int timeout = conf.getInt("spider.timeout", 20000);
         HashSet<Integer> statCodes = new HashSet<>();
         statCodes.add(200);
-        statCodes.add(301);
-        statCodes.add(302);
+
         Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).setTimeOut(timeout).setAcceptStatCode(statCodes);
+        if (Arrays.asList(conf.getString("spider.use.chrome.hosts","www.bilibili.com,m.bilibili.com").split(",")).contains(host)) {
+            site.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
+        }
         SimpleHttpClient client = new SimpleHttpClient(site);
 
         LinkPreview preview = null;
