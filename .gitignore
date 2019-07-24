@@ -1,0 +1,8 @@
+/.idea/
+bak/
+logs/
+target/
+.settings/
+.DS_Store
+/linkpreview.*
+*.iml
