@@ -7,4 +7,4 @@ ADD  target/lib/*  jar/lib/
 ADD  target/linkpreview.jar  jar/lib/app.jar
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-ENTRYPOINT  java -classpath "./jar/lib/*" ${JVM_OPTS} -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 com.zayhu.server.linkpreview.res.Application
+ENTRYPOINT  java -classpath "./jar/lib/*" ${JVM_OPTS} -Djava.security.egd=file:/dev/./urandom -Dfile.encoding=UTF-8 com.zayhu.server.linkpreview.rest.Application
