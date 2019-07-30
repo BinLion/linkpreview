@@ -3,6 +3,7 @@ package com.zayhu.server.linkpreview.service;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.mongodb.Mongo;
+import com.mongodb.WriteResult;
 import com.zayhu.server.httpapi.service.SimpleDAO;
 import com.zayhu.server.linkpreview.model.LinkPreview;
 import com.zayhu.server.linkpreview.util.UrlUtils;
@@ -13,6 +14,7 @@ import com.zayhu.server.util.StatLogger;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.Site;
@@ -77,7 +79,7 @@ public class LinkPreviewService {
         statCodes.add(200);
 
         Site site = Site.me().setUserAgent("WhatsApp/2.19.50 i").addHeader("Referer", url).setTimeOut(timeout).setAcceptStatCode(statCodes);
-        if (Arrays.asList(conf.getString("spider.use.chrome.hosts","www.bilibili.com,m.bilibili.com").split(",")).contains(host)) {
+        if (Arrays.asList(conf.getString("spider.use.chrome.hosts","www.bilibili.com,m.bilibili.com,www.baidu.com,m.baidu.com").split(",")).contains(host)) {
             site.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
         }
         SimpleHttpClient client = new SimpleHttpClient(site);
@@ -120,6 +122,44 @@ public class LinkPreviewService {
         preview.favicon = UrlUtils.fixImageUrl(preview.favicon, parsedURL);
 
         return preview;
+    }
+
+    public LinkPreview updatePreviewInfo(String url) {
+        LinkPreview preview = null;
+        try {
+            preview = getPreviewInfo(url);
+        } catch (MalformedURLException e) {
+            logger.error("updatePreviewInfo. error:{}", e.getMessage());
+            e.printStackTrace();
+        }
+
+        if (preview != null) {
+            setPreviewToRedisCache(url, preview);
+            updatePreviewToMongo(preview);
+        }
+
+        return preview;
+    }
+
+    private void setPreviewToRedisCache(String url, LinkPreview linkPreview) {
+        url = url.replace("\\", "");
+        try {
+            redisService.set(LINK_URL_CACHE + url, linkPreview);
+            redisService.expire(LINK_URL_CACHE + url, conf.getInt("explain.url.expire.time", 600));
+        } catch (IOException e) {
+            logger.error("setPreviewToRedisCache. error:{}", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void updatePreviewToMongo(LinkPreview linkPreview) {
+        if (StringUtils.isEmpty(linkPreview.title)) {
+            WriteResult delete = linkPreviewDAO.delete(linkPreview);
+            logger.info("updatePreviewToMongo. deleted:{}", delete.getN());
+        } else {
+            UpdateResults updateResults = linkPreviewDAO.updateOrCreate(linkPreviewDAO.createQuery().field("url").equal(linkPreview.url), linkPreview);
+            logger.info("updatePreviewToMongo. inserted:{}, updated:{}", updateResults.getInsertedCount(), updateResults.getUpdatedCount());
+        }
     }
 
     public static Boolean ifEncode(String encodeValue) {
