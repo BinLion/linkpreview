@@ -36,4 +36,20 @@ public class LinkPreviewServerResource extends AbstractServerResource {
 
         return this.retrievalResponse.buildJsonResponse(pretty);
     }
+
+    public Representation update(Form form, Representation rep) throws IOException {
+        Form post = new Form(rep);
+        String url = this.getParamFirstValueOrThrow400("url", post);
+
+        try {
+            URL parsedURL = new URL(url);
+            LinkPreview preview = linkPreviewService.updatePreviewInfo(url);
+            retrievalResponse.setResponse(preview);
+        } catch (Exception e) {
+            sLogger.error("url can not be pharsed, error:{}", e.getMessage());
+            retrievalResponse.setResponse(new LinkPreview());
+        }
+
+        return this.retrievalResponse.buildJsonResponse(pretty);
+    }
 }
