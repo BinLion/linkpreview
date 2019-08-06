@@ -95,7 +95,7 @@ public class HttpClientDownloader extends AbstractDownloader {
             logger.info("downloading page success {}", request.getUrl());
             return page;
         } catch (IOException e) {
-            logger.warn("download page {} error", request.getUrl(), e);
+            logger.warn("download page {} error:{}", request.getUrl(), e.getMessage());
             onError(request);
             return page;
         } finally {

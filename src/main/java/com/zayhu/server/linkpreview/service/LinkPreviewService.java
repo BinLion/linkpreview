@@ -48,7 +48,7 @@ public class LinkPreviewService {
         this.linkPreviewDAO = new SimpleDAO(LinkPreview.class, m, mor, dbName);
     }
 
-    public LinkPreview explainUrlFromCache(String linkUrl) throws IOException {
+    public LinkPreview explainUrlFromCache(String linkUrl) throws Exception {
         Long start = System.currentTimeMillis();
         linkUrl = linkUrl.replace("\\", "");
         LinkPreview link = redisService.get(LINK_URL_CACHE + linkUrl, LinkPreview.class);
@@ -71,7 +71,7 @@ public class LinkPreviewService {
         return link;
     }
 
-    public LinkPreview getPreviewInfo(String url) throws MalformedURLException {
+    public LinkPreview getPreviewInfo(String url) throws Exception {
         URL parsedURL = new URL(url);
         String host = parsedURL.getHost();
         int timeout = conf.getInt("spider.timeout", 20000);
@@ -84,17 +84,10 @@ public class LinkPreviewService {
         }
         SimpleHttpClient client = new SimpleHttpClient(site);
 
-        LinkPreview preview = null;
-        try {
-            preview = client.get(url, LinkPreview.class);
-        } catch (Exception e) {
-            logger.error("get preview fail. error:{}", e.getMessage());
-            return new LinkPreview();
-        }
+        LinkPreview preview = client.get(url, LinkPreview.class);
 
         if (preview == null) {
-            preview = new LinkPreview();
-            //preview.title = parsedURL.getPath();
+            throw new Exception("get preview fail");
         }
 
         try {
@@ -124,14 +117,8 @@ public class LinkPreviewService {
         return preview;
     }
 
-    public LinkPreview updatePreviewInfo(String url) {
-        LinkPreview preview = null;
-        try {
-            preview = getPreviewInfo(url);
-        } catch (MalformedURLException e) {
-            logger.error("updatePreviewInfo. error:{}", e.getMessage());
-            e.printStackTrace();
-        }
+    public LinkPreview updatePreviewInfo(String url) throws Exception {
+        LinkPreview preview = getPreviewInfo(url);
 
         if (preview != null) {
             setPreviewToRedisCache(url, preview);
