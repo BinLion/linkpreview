@@ -29,24 +29,8 @@
 
     <repositories>
         <repository>
-            <id>maven-local</id>
-            <name>Maven central local repository</name>
-            <url>http://10.18.101.30:8081/artifactory/maven2</url>
-        </repository>
-        <repository>
-            <id>maven-restlet</id>
-            <name>Restlet local repository</name>
-            <url>http://10.18.101.30:8081/artifactory/maven-restlet</url>
-        </repository>
-        <repository>
-            <id>yeecall-release</id>
-            <name>YeeCall Internal Artifactory-releases</name>
-            <url>http://10.18.101.30:8081/artifactory/yeecall-release</url>
-        </repository>
-        <repository>
-            <id>yeecall-release-snapshot</id>
-            <name>YeeCall Internal Artifactory-snapshots</name>
-            <url>http://10.18.101.30:8081/artifactory/yeecall-snapshot</url>
+            <id>totok-maven-repo</id>
+            <url>http://repo.totok.co:8888/repository/totok-repo/</url>
         </repository>
     </repositories>
 
@@ -63,6 +47,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
@@ -73,6 +58,7 @@
             <artifactId>selenium-java</artifactId>
             <version>3.141.59</version>
         </dependency>
+        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -105,6 +91,40 @@
             <groupId>us.codecraft</groupId>
             <artifactId>webmagic-selenium</artifactId>
             <version>0.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>3.13.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.java.dev.jna</groupId>
+                    <artifactId>jna</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.java.dev.jna</groupId>
+                    <artifactId>jna-platform</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.totok.tools</groupId>
+            <artifactId>APMSysMetrics</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 
