@@ -1,19 +1,34 @@
 package com.zayhu.server.linkpreview.rest;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.inject.Injector;
+import com.totok.apmmetrics.MetricsUtils;
 import com.yeecall.yeetoken.service.config.YeeTokenConfigService;
+import com.yeecall.yeetoken.util.ws.JsonProcessor;
 import com.zayhu.server.httpapi.rest.guice.FinderFactory;
 import com.zayhu.server.httpapi.rest.guice.RestletGuice;
 import com.zayhu.server.httpapi.ws.AbstractWSHandler;
+import com.zayhu.server.httpapi.ws.BothProxyAndAddrRetryWSHandler;
+import com.zayhu.server.httpapi.ws.RetryWithSocksProxyWSHandler;
 import com.zayhu.server.linkpreview.guice.GuiceModule;
 import com.zayhu.server.linkpreview.rest.api.LinkPreviewServerResource;
 import com.zayhu.server.linkpreview.rest.api.inner.LinkPreviewInnerServerResource;
 import com.zayhu.server.util.RestletLoggerUtils;
 import org.apache.commons.configuration.Configuration;
+import org.apache.http.entity.ContentType;
 import org.restlet.Context;
 import org.restlet.routing.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: daisyw
@@ -72,6 +87,9 @@ public class Application extends com.yeecall.yeetoken.yeeapi.rest.Application {
         Injector injector = RestletGuice.createInjector(new GuiceModule());
         int ttl = injector.getInstance(Configuration.class).getInt("network.address.cache.ttl", 30);
         java.security.Security.setProperty("networkaddress.cache.ttl", String.valueOf(ttl));
+
+        metrics();
+
         startApplication(new Application(injector) {
         }, "linkpreview", "");
     }
@@ -82,4 +100,31 @@ public class Application extends com.yeecall.yeetoken.yeeapi.rest.Application {
         }
         return (Application) getInstance();
     }
+
+    private static void metrics() {
+        CompletableFuture.runAsync(() -> {
+            ConcurrentLinkedQueue<JSONObject> queue = MetricsUtils.CollectSystemMetricsInfo();
+            Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+                JSONObject info = queue.poll();
+                if (info!=null) {
+                    CompletableFuture.runAsync(() -> {
+                        String ipaddr = "0.0.0.0";
+                        try {
+                            ipaddr = InetAddress.getLocalHost().getHostAddress();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        info.put("serviceName" , "link-preview-srv");
+                        info.put("ipAddr" , ipaddr);
+//                        RetryWithSocksProxyWSHandler ws = new BothProxyAndAddrRetryWSHandler("http://47.88.237.90:3200/report/sysinfo_report" , null);
+                        RetryWithSocksProxyWSHandler ws = new BothProxyAndAddrRetryWSHandler("http://LogServerReport.servicegroup:3200/report/sysinfo_report", null);
+                        ws.setContentType(ContentType.APPLICATION_JSON);
+                        ws.buildPostBody(JSON.toJSONString(info)).post().process(new JsonProcessor<>(JSONObject.class));
+                    }) ;
+                }
+            },0L,1L, TimeUnit.SECONDS);
+        });
+    }
+
 }
+
