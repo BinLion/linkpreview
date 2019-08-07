@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 container=linkpreview
-tag=20190722
+tag=$(date "+%Y%m%d%H%M%S")
 PREFIX=docker.totok.co:8000/server/${container}
 source ~/.bash_profile
 echo "准备构建....."

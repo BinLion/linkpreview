@@ -27,6 +27,10 @@ public class LinkPreviewServerResource extends AbstractServerResource {
 
         try {
             URL parsedURL = new URL(url);
+            String protocol = parsedURL.getProtocol().toLowerCase();
+            if (!protocol.contains("http")) {
+                throw new Exception("protocol is not http");
+            }
             LinkPreview preview = linkPreviewService.explainUrlFromCache(url);
             retrievalResponse.setResponse(preview);
         } catch (Exception e) {
@@ -43,6 +47,10 @@ public class LinkPreviewServerResource extends AbstractServerResource {
 
         try {
             URL parsedURL = new URL(url);
+            String protocol = parsedURL.getProtocol().toLowerCase();
+            if (!protocol.contains("http")) {
+                throw new Exception("protocol is not http");
+            }
             LinkPreview preview = linkPreviewService.updatePreviewInfo(url);
             retrievalResponse.setResponse(preview);
         } catch (Exception e) {

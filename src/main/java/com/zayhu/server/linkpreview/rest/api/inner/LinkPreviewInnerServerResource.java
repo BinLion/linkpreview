@@ -29,7 +29,7 @@ public class LinkPreviewInnerServerResource extends AbstractInnerServerResource 
         this.linkPreviewService = linkPreviewService;
     }
 
-    public Representation getDoc5(Form form) throws IOException {
+    public Representation getDoc5(Form form) throws Exception {
         String link = this.getParamFirstValueOrThrow400("linkUrl",form);
         LinkPreview preview = linkPreviewService.explainUrlFromCache(link);
         retrievalResponse.setResponse(preview);
