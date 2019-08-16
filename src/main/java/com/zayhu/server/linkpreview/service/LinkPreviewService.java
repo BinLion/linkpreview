@@ -3,6 +3,7 @@ package com.zayhu.server.linkpreview.service;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.mongodb.Mongo;
+import com.mongodb.ReadPreference;
 import com.mongodb.WriteResult;
 import com.zayhu.server.httpapi.service.SimpleDAO;
 import com.zayhu.server.linkpreview.model.LinkPreview;
@@ -45,6 +46,7 @@ public class LinkPreviewService {
         this.conf = conf;
         this.redisService = redisService;
         final String dbName = ConfigUtils.getDefDBName(conf);
+        m.setReadPreference(ReadPreference.secondary());
         this.linkPreviewDAO = new SimpleDAO(LinkPreview.class, m, mor, dbName);
     }
 
